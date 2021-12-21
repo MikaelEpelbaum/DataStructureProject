@@ -1,34 +1,37 @@
 public class GraphNode {
 
     private int Key;
-    private GraphEdge LeftSonEdge;
-    private GraphEdge SiblingEdge;
+    public GraphEdge InEdge;
+    public GraphEdge OutEdge;
 
     public GraphNode(int nodeKey){
         this.Key = nodeKey;
     }
 
-    public GraphNode getSibling(){ return SiblingEdge.Destination; }
-
-    public void setSiblingEdge(GraphEdge siblingEdge) {
-        this.SiblingEdge = siblingEdge;
-    }
-
     public int getKey(){return this.Key;}
 
     public int getOutDegree(){
-        int count = 0;
-        GraphEdge sibling = this.LeftSonEdge;
-        while (sibling != null){
-            sibling = sibling.Destination.SiblingEdge;
+        if (OutEdge == null) return 0;
+        return getSumEdges(this.OutEdge);
+    }
+    public int getInDegree(){
+        if (InEdge == null) return 0;
+        return getSumEdges(this.InEdge);
+    }
+    private int getSumEdges(GraphEdge edge){
+        int count = 1;
+        GraphEdge iterator = edge;
+        while (iterator != null){
+            iterator = iterator.NextEdge;
             count +=1;
         }
         return count;
     }
-    public int getInDegree(){
-        if (this.Key == 0) return 0;
-        return 1;
+
+    public void setInEdge(GraphEdge inEdge) {
+        this.InEdge = inEdge;
     }
-
-
+    public void setOutEdge(GraphEdge outEdge) {
+        this.OutEdge = outEdge;
+    }
 }
