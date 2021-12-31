@@ -9,37 +9,38 @@ class RootedTree {
 
     public void setSource(GraphNode source) {
         this.Source = source;
+        source.setExtreme();
     }
-
-//    public void printByLayer(DataOutputStream out) throws IOException {
-//        printByLayerRecursive(out, Source);
-//    }
 
     /* Function to line by line print level order traversal a tree*/
     public void printByLayer(DataOutputStream out)throws IOException{
-        int h = maxDepth(Source) + 1;
-        for (int i=1; i<=h; i++)
-        {
+        int h = maxDepth(Source) + 1;                                   /*o(n) if tree is linear*/
+        for (int i=1; i<=h; i++){                                       /*o(n) if tree is linear*/
             printGivenLevel(out, Source, i);
-//            System.out.println();
+            if(i!=h)
+                out.writeUTF("\n");
         }
     }
-    /* Print nodes at a given level */
-    void printGivenLevel(DataOutputStream out, GraphNode root, int level)throws IOException{
-        if (root == null)
-            return;
-        if (level == 1) {
-//            System.out.println(root.getKey());
-            out.writeInt(root.getKey());
 
-        }
-        else if (level > 1)
-        {
-            printGivenLevel(out, root.OutEdge.Destination, level-1);
-            try {
-                if (root.OutEdge.NextEdge.Destination != null) {
-                    out.writeChars(",");
-                    printGivenLevel(out, root.OutEdge.NextEdge.Destination, level - 1);
+    public void preorderPrint(DataOutputStream out)throws IOException {
+        preorderPrintRecursive(out, Source);
+    }
+
+    public void preorderPrintRecursive(DataOutputStream out, GraphNode g)throws IOException {
+        if ( g == null)
+            return;
+        else {
+            if(g.getInDegree() == 0 && g.isExtremeLeft)
+                out.writeUTF(String.valueOf(g.getKey()));
+            else {
+                out.writeUTF(",");
+                out.writeUTF(String.valueOf(g.getKey()));
+            }
+            GraphEdge kids = g.OutEdge;
+            try{
+                while (kids != null){
+                    preorderPrintRecursive(out, kids.Destination);
+                    kids = kids.NextEdge;
                 }
             }
             catch (NullPointerException e) {return;}
@@ -47,30 +48,32 @@ class RootedTree {
     }
 
 
-//    public void printByLayerRecursive(DataOutputStream out, GraphNode s)throws IOException{
-//        out.writeInt(s.getKey());
-//        if (s.OutEdge == null){
-//            return;
-//        }
-//
-//        GraphEdge OutEdge = s.OutEdge;
-//        while (OutEdge.NextEdge != null){
-//            te(out, OutEdge.Destination);
-//            OutEdge = OutEdge.NextEdge;
-//        }
-//        OutEdge = s.OutEdge;
-//        while (OutEdge.NextEdge != null){
-//            printByLayerRecursive(out, OutEdge.Destination);
-//        }
-//        out.writeInt(OutEdge.Destination.getKey());
-//    }
-//
-//    private void te(DataOutputStream out, GraphNode s)throws IOException{
-//        out.writeInt(s.getKey());
-//        out.writeChars(",");
-//    }
 
-    public int maxDepth(GraphNode treeNode) {
+    /* Print nodes at a given level */
+    private void printGivenLevel(DataOutputStream out, GraphNode root, int level)throws IOException{
+        if (root == null)
+            return;
+        if (level == 1) {
+            if(!root.isExtremeLeft)
+                out.writeUTF(",");
+            out.writeUTF(String.valueOf(root.getKey()));
+        }
+        else if (level > 1)
+        {
+            printGivenLevel(out, root.OutEdge.Destination, level-1);
+            try {
+                GraphEdge nextEdge = root.OutEdge.NextEdge;
+                while (nextEdge != null) {
+                    printGivenLevel(out, nextEdge.Destination, level - 1);
+                    nextEdge = nextEdge.NextEdge;
+                }
+            }
+            catch (NullPointerException e) {return;}
+        }
+    }
+
+
+    private int maxDepth(GraphNode treeNode) {
         int depth = 0;
         if (treeNode.OutEdge == null)
             return depth;
@@ -85,6 +88,5 @@ class RootedTree {
     }
 
 
-    public void preorderPrint(DataOutputStream out) {}
 
 }

@@ -1,13 +1,19 @@
 public class DynamicGraph {
 
+    GraphNode masterSource;
+    GraphNode lastSo;
+
     public DynamicGraph() {}
 
     public GraphNode insertNode(int nodeKey) {
-        return new GraphNode(nodeKey);
+        GraphNode n = new GraphNode(nodeKey);
+        if (masterSource == null)
+            masterSource = n;
+        return n;
     }
 
     public void deleteNode(GraphNode node){
-        if (node.getInDegree() == 0 && node.getOutDegree() == 0){
+        if (node.InEdge == null && node.OutEdge == null){
             //todo
             int x = 0;
         }

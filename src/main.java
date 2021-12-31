@@ -18,6 +18,9 @@ public class main {
         GraphEdge l1l2l3 = new GraphEdge(l2, l3);
         GraphEdge l1l2r3 = new GraphEdge(l2, llr3, l1l2l3);
 
+        GraphNode llr4 = new GraphNode(10);
+        GraphEdge l1l2r4 = new GraphEdge(l2, llr4, l1l2r3);
+
 
 
 
@@ -25,20 +28,19 @@ public class main {
         FileOutputStream fo = new FileOutputStream(f);
         DataOutputStream dos = new DataOutputStream(fo);
         rt.printByLayer(dos);
+//        rt.preorderPrint(dos);
         fo.close();
         dos.close();
         FileInputStream fi = new FileInputStream(f);
         DataInputStream di = new DataInputStream(fi);
-        System.out.println(di.readInt());
-        System.out.println(di.readInt());
-        System.out.println(di.readChar());
-        System.out.println(di.readInt());
-        System.out.println(di.readInt());
-        System.out.println(di.readChar());
-        System.out.println(di.readInt());
-        System.out.println(di.readInt());
-        System.out.println(di.readChar());
-        System.out.println(di.readInt());
+        String printable;
+        try {
+            printable = di.readUTF();
+            while (printable != null) {
+                System.out.print(printable);
+                printable = di.readUTF();
+            }
+        } catch (IOException e) {}
         di.close();
 
 

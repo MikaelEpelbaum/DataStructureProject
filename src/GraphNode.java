@@ -3,9 +3,15 @@ public class GraphNode {
     private int Key;
     public GraphEdge InEdge;
     public GraphEdge OutEdge;
+    public boolean isExtremeLeft;
+
 
     public GraphNode(int nodeKey){
         this.Key = nodeKey;
+    }
+
+    public void setExtreme() {
+        this.isExtremeLeft = true;
     }
 
     public int getKey(){return this.Key;}
