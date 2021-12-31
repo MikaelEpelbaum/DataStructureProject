@@ -3,6 +3,7 @@ public class GraphEdge {
     public GraphNode Origin;
     public GraphNode Destination;
     public GraphEdge NextEdge;
+    public GraphEdge Previuos;
     public boolean isFirst;
 
     public GraphEdge(GraphNode origin, GraphNode destination){
@@ -17,10 +18,12 @@ public class GraphEdge {
         this.Destination = destination;
         this.isFirst = false;
         previous.NextEdge = this;
+        this.Previuos = previous;
     }
 
     private void UpdateBelligerent(GraphNode origin, GraphNode destination){
         origin.setOutEdge(this);
         destination.setInEdge(this);
+        this.Previuos = null;
     }
 }

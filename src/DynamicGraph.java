@@ -13,21 +13,27 @@ public class DynamicGraph {
     }
 
     public void deleteNode(GraphNode node){
-        if (node.InEdge == null && node.OutEdge == null){
-            //todo
-            int x = 0;
+        if (node.OutEdge == null && node.InEdge.Origin == masterSource){
+            node.InEdge.Previuos.NextEdge = node.InEdge.NextEdge;
+            node.InEdge.NextEdge = node.InEdge.Previuos.NextEdge;
         }
     }
 
-//    public GraphEdge insertEdge(GraphNode from, GraphNode to){
-//        to.setSiblingEdge(new GraphEdge(to, from.getSibling()));
-//        GraphEdge edge = new GraphEdge(from, to);
-//        from.setSiblingEdge(edge);
-//        return edge;
-//    }
+    public GraphEdge insertEdge(GraphNode from, GraphNode to){
+        if (from.InEdge != null)
+            return new GraphEdge(from, to, from.InEdge);
+        return new GraphEdge(from, to);
+    }
 
-    public void deleteEdge(GraphEdge edge){
-        //todo
+    public void deleteEdge(GraphEdge edge) {
+        if (edge.Destination != null)
+            return;  /*error*/
+        if (edge.Previuos != null && edge.NextEdge != null){
+            edge.Previuos.NextEdge = edge.NextEdge;
+            edge.NextEdge.Previuos = edge.Previuos;
+        }
+        if (edge.Previuos != null && edge.NextEdge == null)
+            edge.Previuos.NextEdge = null;
     }
 
     public RootedTree ssc(){
