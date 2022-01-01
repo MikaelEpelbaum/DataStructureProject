@@ -30,17 +30,17 @@ public class DynamicGraph {
     }
 
     public void deleteEdge(GraphEdge edge) {
-        if (edge.Destination != null)
-            return;  /*error*/
         if (edge.Previuos != null && edge.NextEdge != null) {
             edge.Previuos.NextEdge = edge.NextEdge;
             edge.NextEdge.Previuos = edge.Previuos;
         }
         if (edge.Previuos != null && edge.NextEdge == null)
             edge.Previuos.NextEdge = null;
+        if (edge.Previuos == null && edge.NextEdge != null)
+            edge.NextEdge.Previuos = null;
     }
 
-    public RootedTree ssc() {
+    public RootedTree scc() {
         RootedTree rt = new RootedTree();
         GraphNode S = new GraphNode(0);
         rt.setSource(S);
