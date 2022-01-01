@@ -48,7 +48,6 @@ class RootedTree {
     }
 
 
-
     /* Print nodes at a given level */
     private void printGivenLevel(DataOutputStream out, GraphNode root, int level)throws IOException{
         if (root == null)

@@ -5,9 +5,20 @@ public class GraphNode {
     public GraphEdge OutEdge;
     public boolean isExtremeLeft;
 
+    public boolean isDynamic;
+    public double distance;
+    public GraphNode parent;
+    public int color;
+   /*
+   white - 0 - undiscovered
+   grey - 1 - discovered but it may have undiscovered neighbors
+   black - 2 - v and all its neighbors have been discovered
+   */
+
 
     public GraphNode(int nodeKey){
         this.Key = nodeKey;
+        isDynamic = true;
     }
 
     public void setExtreme() {
@@ -15,6 +26,11 @@ public class GraphNode {
     }
 
     public int getKey(){return this.Key;}
+
+    public int getColor() {return this.color;}
+    public void setColor(int c) {this.color = c;}
+    public void setDistance(double d) {this.distance = d;}
+    public void setParent(GraphNode p) {this.parent = p;}
 
     public int getOutDegree(){
         if (OutEdge == null) return 0;

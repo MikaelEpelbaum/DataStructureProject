@@ -1,14 +1,17 @@
 public class DynamicGraph {
 
     GraphNode masterSource;
-    GraphNode lastSo;
+    private LinkedListQueue queue;
 
     public DynamicGraph() {}
 
     public GraphNode insertNode(int nodeKey) {
         GraphNode n = new GraphNode(nodeKey);
-        if (masterSource == null)
+        if (masterSource == null){
             masterSource = n;
+            queue = new LinkedListQueue();
+        }
+        else queue.enqueue(n);
         return n;
     }
 
@@ -16,6 +19,7 @@ public class DynamicGraph {
         if (node.OutEdge == null && node.InEdge.Origin == masterSource){
             node.InEdge.Previuos.NextEdge = node.InEdge.NextEdge;
             node.InEdge.NextEdge = node.InEdge.Previuos.NextEdge;
+            node.isDynamic = false;
         }
     }
 
@@ -44,7 +48,43 @@ public class DynamicGraph {
     }
 
     public RootedTree bfs(GraphNode source){
-        //todo recopier
+        LinkedListQueue llq = new LinkedListQueue();
+        BFSInitialise(source, llq);
+        while (!llq.isEmpty()){
+            GraphNode u = llq.dequeue();
+            GraphEdge kids = u.OutEdge;
+            while (kids != null){
+                if (kids.Destination.color == 0){
+                    kids.Destination.setColor(1);
+                    kids.Destination.setDistance(u.distance + 1);
+                    kids.Destination.parent.setParent(u);
+                    llq.enqueue(kids.Destination);
+                    kids = kids.NextEdge;
+                }
+            }
+            u.setColor(2);
+        }
         return new RootedTree();
+    }
+
+    public RootedTree dfs(GraphNode source){
+        LinkedListQueue q = new LinkedListQueue();
+
+    }
+
+    private void BFSInitialise(GraphNode S, LinkedListQueue q){
+        GraphNode head = queue.dequeue();
+        while (head!=null){
+            head.color = 0;
+            head.distance = Double.POSITIVE_INFINITY;
+            head.parent = null;
+            queue.enqueue(head);
+            head = queue.dequeue();
+        }
+        S.color = 1;
+        S.distance = 0;
+        S.parent = null;
+        q.emptyQueue();
+        q.enqueue(S);
     }
 }
