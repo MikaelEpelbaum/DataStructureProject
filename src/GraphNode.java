@@ -6,9 +6,10 @@ public class GraphNode {
     public boolean isExtremeLeft;
 
     public boolean isDynamic;
-    public double distance;
-    public GraphNode parent;
-    public int color;
+    private double distance;
+    private int retraction;
+    private GraphNode parent;
+    private int color;
    /*
    white - 0 - undiscovered
    grey - 1 - discovered but it may have undiscovered neighbors
@@ -29,8 +30,10 @@ public class GraphNode {
 
     public int getColor() {return this.color;}
     public void setColor(int c) {this.color = c;}
+    public double getDistance() {return this.distance;}
     public void setDistance(double d) {this.distance = d;}
     public void setParent(GraphNode p) {this.parent = p;}
+    public void setRetraction(int t) {this.retraction = t;}
 
     public int getOutDegree(){
         if (OutEdge == null) return 0;

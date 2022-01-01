@@ -47,18 +47,54 @@ public class DynamicGraph {
         return rt;
     }
 
+    private void dfs(GraphNode source){
+        LinkedListQueue temp = new LinkedListQueue();
+        while (!queue.isEmpty()){
+            GraphNode head = queue.dequeue();
+            head.setColor(0);
+            head.setParent(null);
+            temp.enqueue(head);
+        }
+        Queues.tranfer(temp, queue);
+        int time = 0;
+        while (!queue.isEmpty()){
+            GraphNode head = queue.dequeue();
+            if (head.getColor() == 0)
+                DFSVisit(head, time);
+            temp.enqueue(head);
+        }
+        Queues.tranfer(temp, queue);
+    }
+
+    private void DFSVisit(GraphNode u, int time){
+        time +=1;
+        u.setDistance(time);
+        u.setColor(1);
+        GraphEdge kids = u.OutEdge;
+        while (kids != null){
+            if(kids.Destination.getColor() == 0){
+                kids.Destination.setParent(u);
+                DFSVisit(kids.Destination, time);
+                kids = kids.NextEdge;
+            }
+        }
+        u.setColor(2);
+        time +=1;
+        u.setRetraction(time);
+    }
+
     public RootedTree bfs(GraphNode source){
-        LinkedListQueue llq = new LinkedListQueue();
-        BFSInitialise(source, llq);
-        while (!llq.isEmpty()){
-            GraphNode u = llq.dequeue();
+        LinkedListQueue q = new LinkedListQueue();
+        BFSInitialise(source, q);
+        while (!q.isEmpty()){
+            GraphNode u = q.dequeue();
             GraphEdge kids = u.OutEdge;
             while (kids != null){
-                if (kids.Destination.color == 0){
+                if (kids.Destination.getColor() == 0){
                     kids.Destination.setColor(1);
-                    kids.Destination.setDistance(u.distance + 1);
-                    kids.Destination.parent.setParent(u);
-                    llq.enqueue(kids.Destination);
+                    kids.Destination.setDistance(u.getDistance() + 1);
+                    kids.Destination.setParent(u);
+                    q.enqueue(kids.Destination);
                     kids = kids.NextEdge;
                 }
             }
@@ -67,23 +103,18 @@ public class DynamicGraph {
         return new RootedTree();
     }
 
-    public RootedTree dfs(GraphNode source){
-        LinkedListQueue q = new LinkedListQueue();
-
-    }
-
     private void BFSInitialise(GraphNode S, LinkedListQueue q){
         GraphNode head = queue.dequeue();
         while (head!=null){
-            head.color = 0;
-            head.distance = Double.POSITIVE_INFINITY;
-            head.parent = null;
+            head.setColor(0);
+            head.setDistance(Double.POSITIVE_INFINITY);
+            head.setParent(null);
             queue.enqueue(head);
             head = queue.dequeue();
         }
-        S.color = 1;
-        S.distance = 0;
-        S.parent = null;
+        S.setColor(1);
+        S.setDistance(0);
+        S.setParent(null);
         q.emptyQueue();
         q.enqueue(S);
     }
