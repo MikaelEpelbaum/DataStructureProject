@@ -16,28 +16,26 @@ public class DynamicGraph {
     }
 
     public void deleteNode(GraphNode node) {
-        if (node.OutEdge == null && node.InEdge.Origin == masterSource) {
-            node.InEdge.Previuos.NextEdge = node.InEdge.NextEdge;
-            node.InEdge.NextEdge = node.InEdge.Previuos.NextEdge;
+        if (node.OutEdge.isEmpty() && node.InEdge.isEmpty()) {
             node.isDynamic = false;
         }
     }
 
     public GraphEdge insertEdge(GraphNode from, GraphNode to) {
-        if (from.InEdge != null)
-            return new GraphEdge(from, to, from.InEdge);
         return new GraphEdge(from, to);
     }
 
     public void deleteEdge(GraphEdge edge) {
-        if (edge.Previuos != null && edge.NextEdge != null) {
-            edge.Previuos.NextEdge = edge.NextEdge;
-            edge.NextEdge.Previuos = edge.Previuos;
+        boolean prev = edge.Previous != null;
+        boolean next = edge.NextEdge != null;
+        if (prev && next) {
+            edge.Previous.NextEdge = edge.NextEdge;
+            edge.NextEdge.Previous = edge.Previous;
         }
-        if (edge.Previuos != null && edge.NextEdge == null)
-            edge.Previuos.NextEdge = null;
-        if (edge.Previuos == null && edge.NextEdge != null)
-            edge.NextEdge.Previuos = null;
+        if (prev && !next)
+            edge.Previous.NextEdge = null;
+        if (!prev && next)
+            edge.NextEdge.Previous = null;
     }
 
     public RootedTree scc() {
@@ -60,9 +58,9 @@ public class DynamicGraph {
             ((GraphNode) queue.getAt(i)).setColor(0);
 
         while (!st.isEmpty()){
-            GraphNode v = (GraphNode) st.pop();
+            GraphNode v = st.pop();
             if(v.getColor() == 0)
-                new GraphEdge(S, transposed.DFSUtil(v.OutEdge).Origin);
+                new GraphEdge(S, transposed.DFSUtil(v.OutEdge.dequeue()).Origin);
         }
         return rt;
     }
@@ -72,18 +70,19 @@ public class DynamicGraph {
         while (v.NextEdge != null){
             v = v.NextEdge;
             if(v.Destination.getColor() == 0)
-                DFSUtil(v.Destination.OutEdge);
+                DFSUtil(v.Destination.OutEdge.dequeue());
         }
         return v;
     }
 
     private void fillOreder(GraphNode v, StackList st){
         v.setColor(1);
-        GraphEdge kids = v.OutEdge;
-        while (kids.NextEdge != null){
-            kids = kids.NextEdge;
-            if(kids.Destination.getColor() == 0)
-                fillOreder(kids.Destination, st);
+        LinkedListQueue<GraphEdge> kids = v.OutEdge;
+        GraphEdge kid = kids.dequeue();
+        while (kid.NextEdge != null){
+            if(kid.Destination.getColor() == 0)
+                fillOreder(kid.Destination, st);
+            kid = kids.dequeue();
         }
         st.push(v);
     }
@@ -92,10 +91,11 @@ public class DynamicGraph {
         DynamicGraph g = new DynamicGraph();
         for (int i = 0; i < queue.getSize(); i++){
             GraphNode v = (GraphNode) queue.dequeue();
-            GraphEdge kids = v.OutEdge;
-            while (kids != null){
-                g.queue.enqueue(new GraphEdge(kids.Destination, kids.Origin));
-                kids = kids.NextEdge;
+            LinkedListQueue<GraphEdge> kids = v.OutEdge;
+            GraphEdge kid = kids.dequeue();
+            while (kid != null){
+                g.queue.enqueue(new GraphEdge(kid.Destination, kid.Origin));
+                kid = kids.dequeue();
             }
         }
         return g;
@@ -124,12 +124,13 @@ public class DynamicGraph {
         time +=1;
         u.setDistance(time);
         u.setColor(1);
-        GraphEdge kids = u.OutEdge;
-        while (kids != null){
-            if(kids.Destination.getColor() == 0){
-                kids.Destination.setParent(u);
-                DFSVisit(kids.Destination, time);
-                kids = kids.NextEdge;
+        LinkedListQueue<GraphEdge> kids = u.OutEdge;
+        GraphEdge kid = kids.dequeue();
+        while (kid != null){
+            if(kid.Destination.getColor() == 0){
+                kid.Destination.setParent(u);
+                DFSVisit(kid.Destination, time);
+                kid = kids.dequeue();
             }
         }
         u.setColor(2);
@@ -142,15 +143,16 @@ public class DynamicGraph {
         BFSInitialise(source, q);
         while (!q.isEmpty()){
             GraphNode u = (GraphNode) q.dequeue();
-            GraphEdge kids = u.OutEdge;
-            while (kids != null){
-                if (kids.Destination.getColor() == 0){
-                    kids.Destination.setColor(1);
-                    kids.Destination.setDistance(u.getDistance() + 1);
-                    kids.Destination.setParent(u);
-                    q.enqueue(kids.Destination);
-                    kids = kids.NextEdge;
+            LinkedListQueue<GraphEdge> kids = u.OutEdge;
+            GraphEdge kid = kids.dequeue();
+            while (kid != null){
+                if (kid.Destination.getColor() == 0){
+                    kid.Destination.setColor(1);
+                    kid.Destination.setDistance(u.getDistance() + 1);
+                    kid.Destination.setParent(u);
+                    q.enqueue(kid.Destination);
                 }
+                kid = kids.dequeue();
             }
             u.setColor(2);
         }
@@ -159,13 +161,17 @@ public class DynamicGraph {
 
     private void BFSInitialise(GraphNode S, LinkedListQueue q){
         GraphNode head = (GraphNode) queue.dequeue();
+        LinkedListQueue temp = new LinkedListQueue();
+        try{
         while (head!=null){
             head.setColor(0);
             head.setDistance(Double.POSITIVE_INFINITY);
             head.setParent(null);
-            queue.enqueue(head);
+            temp.enqueue(head);
             head = (GraphNode) queue.dequeue();
-        }
+            }
+        } catch (NullPointerException e){}
+        Queues.tranfer(temp, queue);
         S.setColor(1);
         S.setDistance(0);
         S.setParent(null);

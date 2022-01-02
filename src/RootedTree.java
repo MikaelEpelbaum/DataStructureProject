@@ -30,17 +30,18 @@ class RootedTree {
         if ( g == null)
             return;
         else {
-            if(g.getInDegree() == 0 && g.isExtremeLeft)
+            if (g.getInDegree() == 0 && g.isExtremeLeft)
                 out.writeUTF(String.valueOf(g.getKey()));
             else {
                 out.writeUTF(",");
                 out.writeUTF(String.valueOf(g.getKey()));
             }
-            GraphEdge kids = g.OutEdge;
+            LinkedListQueue<GraphEdge> kids = g.OutEdge;
             try{
-                while (kids != null){
-                    preorderPrintRecursive(out, kids.Destination);
-                    kids = kids.NextEdge;
+                GraphEdge kid = kids.getFront();
+                while (kid != null){
+                    preorderPrintRecursive(out, kid.Destination);
+                    kid = kid.NextEdge;
                 }
             }
             catch (NullPointerException e) {return;}
@@ -59,9 +60,9 @@ class RootedTree {
         }
         else if (level > 1)
         {
-            printGivenLevel(out, root.OutEdge.Destination, level-1);
+            printGivenLevel(out, root.OutEdge.getFront().Destination, level-1);
             try {
-                GraphEdge nextEdge = root.OutEdge.NextEdge;
+                GraphEdge nextEdge = root.OutEdge.getFront().NextEdge;
                 while (nextEdge != null) {
                     printGivenLevel(out, nextEdge.Destination, level - 1);
                     nextEdge = nextEdge.NextEdge;
@@ -74,10 +75,10 @@ class RootedTree {
 
     private int maxDepth(GraphNode treeNode) {
         int depth = 0;
-        if (treeNode.OutEdge == null)
+        if (treeNode.OutEdge.getSize() == 0)
             return depth;
         else {
-            GraphEdge outers = treeNode.OutEdge;
+            GraphEdge outers = treeNode.OutEdge.getFront();
             while (outers != null){
                 depth = Math.max(depth, this.maxDepth(outers.Destination));
                 outers = outers.NextEdge;

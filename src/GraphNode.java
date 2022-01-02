@@ -1,8 +1,8 @@
 public class GraphNode {
 
     private int Key;
-    public GraphEdge InEdge;
-    public GraphEdge OutEdge;
+    public LinkedListQueue<GraphEdge> InEdge;
+    public LinkedListQueue<GraphEdge> OutEdge;
     public boolean isExtremeLeft;
 
     public boolean isDynamic;
@@ -16,9 +16,10 @@ public class GraphNode {
    black - 2 - v and all its neighbors have been discovered
    */
 
-
     public GraphNode(int nodeKey){
         this.Key = nodeKey;
+        InEdge = new LinkedListQueue<>();
+        OutEdge = new LinkedListQueue<>();
         isDynamic = true;
     }
 
@@ -36,27 +37,9 @@ public class GraphNode {
     public void setRetraction(int t) {this.retraction = t;}
 
     public int getOutDegree(){
-        if (OutEdge == null) return 0;
-        return getSumEdges(this.OutEdge);
+        return this.OutEdge.getSize();
     }
     public int getInDegree(){
-        if (InEdge == null) return 0;
-        return getSumEdges(this.InEdge);
-    }
-    private int getSumEdges(GraphEdge edge){
-        int count = 1;
-        GraphEdge iterator = edge;
-        while (iterator != null){
-            iterator = iterator.NextEdge;
-            count +=1;
-        }
-        return count;
-    }
-
-    public void setInEdge(GraphEdge inEdge) {
-        this.InEdge = inEdge;
-    }
-    public void setOutEdge(GraphEdge outEdge) {
-        this.OutEdge = outEdge;
+        return this.InEdge.getSize();
     }
 }

@@ -21,6 +21,18 @@ class LinkedListQueue<T>
     //check if the queue is empty
     public boolean isEmpty() {return (queueSize == 0);}
     public int getSize(){return queueSize;}
+    public T getFront() throws NullPointerException {
+        try {
+            return this.front.data;
+        }
+        catch (NullPointerException e) {return null;}
+    }
+    public T getRear() throws NullPointerException {
+        try {
+            return this.rear.data;
+        }
+        catch (NullPointerException e) {return null;}
+    }
 
     public void emptyQueue() {
         front = null;
