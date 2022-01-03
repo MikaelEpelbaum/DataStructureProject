@@ -45,12 +45,19 @@ public class DynamicGraph {
 
         StackList st = new StackList();
 
-        for (int i = 0; i < queue.getSize(); i++)
-            ((GraphNode) queue.getAt(i)).setColor(0);
+        for (int i = 0; i< queue.getSize(); i++){
+            GraphNode temp = ((GraphNode) queue.dequeue());
+            temp.setColor(0);
+            queue.enqueue(temp);
+        }
 
-        for (int i = 0; i < queue.getSize(); i++)
-             if(((GraphNode) queue.getAt(i)).getColor() == 0)
-                fillOreder((GraphNode) queue.getAt(i), st);
+        LinkedListQueue temp = new LinkedListQueue();
+        for (int i = 0; i < queue.getSize(); i++) {
+            GraphNode seeked = (GraphNode) queue.getAt(i);
+            if (seeked.getColor() == 0)
+                fillOreder((GraphNode) seeked, st, temp);
+        }
+        Queues.tranfer(temp, queue);
 
          DynamicGraph transposed = getTranspose();
 
@@ -75,16 +82,20 @@ public class DynamicGraph {
         return v;
     }
 
-    private void fillOreder(GraphNode v, StackList st){
-        v.setColor(1);
-        LinkedListQueue<GraphEdge> kids = v.OutEdge;
-        GraphEdge kid = kids.dequeue();
-        while (kid.NextEdge != null){
-            if(kid.Destination.getColor() == 0)
-                fillOreder(kid.Destination, st);
-            kid = kids.dequeue();
-        }
-        st.push(v);
+    private void fillOreder(GraphNode v, StackList st, LinkedListQueue temp){
+
+        try {
+            v.setColor(1);
+            LinkedListQueue<GraphEdge> kids = v.OutEdge;
+            GraphEdge kid = kids.dequeue();
+            while (kid.NextEdge != null) {
+                temp.enqueue(kid);
+                if (kid.Destination.getColor() == 0)
+                    fillOreder(kid.Destination, st, temp);
+                kid = kids.dequeue();
+            }
+            st.push(v);
+        } catch (NullPointerException e){return;}
     }
 
     private DynamicGraph getTranspose(){
@@ -163,7 +174,7 @@ public class DynamicGraph {
         GraphNode head = (GraphNode) queue.dequeue();
         LinkedListQueue temp = new LinkedListQueue();
         try{
-        while (head!=null){
+        while (head!=null && head != S){
             head.setColor(0);
             head.setDistance(Double.POSITIVE_INFINITY);
             head.setParent(null);

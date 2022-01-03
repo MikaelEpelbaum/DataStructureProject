@@ -43,14 +43,16 @@ class LinkedListQueue<T>
     //Remove item from the front of the queue.
     public T dequeue()
     {
-        T data = front.data;
-        front = front.next;
-        if (isEmpty())
-        {
-            rear = null;
-        }
-        queueSize--;
-        return data;
+        try{
+            T data = front.data;
+            front = front.next;
+            if (isEmpty())
+            {
+                rear = null;
+            }
+            queueSize--;
+            return data;
+        } catch (NullPointerException e) {return null;}
     }
 
     //Add data at the rear of the queue.

@@ -1,24 +1,17 @@
 public class ArrayList<T> extends LinkedListQueue<T>{
-    private int len;
-
-    ArrayList(){
-        this.len = 0;
-    }
-
-    public int getLen() {
-        return len;
-    }
+    ArrayList() {}
 
     public T getAt(int i){
-        if(i <= this.len) {
+        if(i <= this.getSize()) {
             LinkedListQueue temp = new LinkedListQueue();
-            int cnt = 1;
+            int cnt = 0;
             T val = null;
             while (!super.isEmpty()) {
                 if (cnt == i) {
                     val = super.dequeue();
                     temp.enqueue(val);
                 } else temp.enqueue(super.dequeue());
+                cnt+=1;
             }
             Queues.tranfer(temp, this);
             return val;
