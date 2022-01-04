@@ -1,4 +1,4 @@
-public class GraphNode {
+class GraphNode {
 
     private int Key;
     public LinkedListQueue<GraphEdge> InEdge;

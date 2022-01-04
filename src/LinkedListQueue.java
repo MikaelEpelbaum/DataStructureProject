@@ -1,7 +1,7 @@
 class LinkedListQueue<T>
 {
-    private Node<T> front, rear;
-    private int queueSize; // queue size
+    protected Node<T> front, rear;
+    protected int queueSize; // queue size
 
     //linked list node
     protected class Node<T>{
@@ -49,17 +49,16 @@ class LinkedListQueue<T>
         try{
             T data = front.data;
             front = front.next;
-            if (isEmpty())
-            {
+            queueSize--;
+            if (isEmpty()) {
                 rear = null;
             }
-            queueSize--;
             return data;
         } catch (NullPointerException e) {return null;}
     }
 
     //Add data at the rear of the queue.
-    public void enqueue(T data)
+    public Node<T> enqueue(T data)
     {
         Node oldRear = rear;
         rear = new Node();
@@ -73,6 +72,7 @@ class LinkedListQueue<T>
             oldRear.next = rear;
         }
         queueSize++;
+        return oldRear;
     }
 
 }
@@ -84,7 +84,6 @@ class Queues{
             to.setRear(from.getRear());
             to.setSize(from.getSize());
             from.emptyQueue();
-//            to.enqueue(from.dequeue());
         }
     }
 }

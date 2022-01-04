@@ -23,4 +23,11 @@ public class GraphEdge {
         destination.InEdge.enqueue(this);
 
     }
+
+    public GraphEdge inverse(){
+        GraphNode temp = this.Origin;
+        this.Origin = this.Destination;
+        this.Destination = temp;
+        return this;
+    }
 }

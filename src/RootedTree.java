@@ -31,6 +31,7 @@ class RootedTree {
             return;
         else {
             if (g.getInDegree() == 0 && g.isExtremeLeft)
+//            if(g.isExtremeLeft)
                 out.writeUTF(String.valueOf(g.getKey()));
             else {
                 out.writeUTF(",");

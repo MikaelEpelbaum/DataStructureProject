@@ -1,45 +1,63 @@
-public class StackList {
+public class StackList<T> extends LinkedListQueue<T>{
 
-    private Node head;
+    private Node<T> head;
     private int queueSize; // queue size
 
-    //linked list node
-    private class Node {
-        GraphNode data;
-        Node next;
+    protected class Node<T> extends LinkedListQueue.Node{
+        Node<T> previous;
     }
 
     //default constructor - initially head is null; size=0; stack is empty
     public StackList() {
+        super();
         head = null;
-        queueSize = 0;
+        queueSize = super.queueSize;
     }
 
-    //check if the queue is empty
-    public boolean isEmpty()
-    {
-        return (queueSize == 0);
+//    //check if the queue is empty
+//    public boolean isEmpty()
+//    {
+//        return (queueSize == 0);
+//    }
+
+//    public void push(T data){
+//        Node oldHead = head;
+//        Node newHead = new Node();
+//        newHead.data = data;
+//        newHead.next = oldHead;
+//        head = newHead;
+//        queueSize +=1;
+//    }
+
+    public void push(T data){
+        Node n = new Node();
+        n.data = data;
+        n.previous = head;
+        this.head = n;
+        this.queueSize +=1;
     }
 
-    public void push(GraphNode data){
-        Node oldHead = head;
-        Node newHead = new Node();
-        newHead.data = data;
-        newHead.next = oldHead;
-        head = newHead;
-        queueSize +=1;
-    }
-
-    public GraphNode top(){
-        if (head != null) return head.data;
-        return null;
-    }
-
-    public GraphNode pop(){
+    public T pop(){
         if (head != null){
-            this.head = this.head.next;
-            return head.data;
+            Node cur = head;
+            this.head = this.head.previous;
+            return (T) cur.data;
         }
         return null;
     }
+
+//    public T top(){
+//        if (head != null) return head.data;
+//        return null;
+//    }
+
+//    public T pop(){
+//        if (head != null){
+//            T top = head.data;
+//            this.head = this.head.next;
+//            queueSize -= 1;
+//            return top;
+//        }
+//        return null;
+//    }
 }
