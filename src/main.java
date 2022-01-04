@@ -27,8 +27,8 @@ public class main {
         File f = new File("test.txt");
         FileOutputStream fo = new FileOutputStream(f);
         DataOutputStream dos = new DataOutputStream(fo);
-//        rt.printByLayer(dos);
-        rt.preorderPrint(dos);
+        rt.printByLayer(dos);
+//        rt.preorderPrint(dos);
         fo.close();
         dos.close();
         FileInputStream fi = new FileInputStream(f);

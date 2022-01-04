@@ -17,25 +17,45 @@ class RootedTree {
 
     /* Function to line by line print level order traversal a tree*/
     public void printByLayer(DataOutputStream out)throws IOException{
-        int h;
-        if (Source.getKey() == 0)
-            h = (int) Source.getDistance()+1;
-        else h = maxDepth(Source) + 1;                                   /*o(n) if tree is linear*/
-        for (int i=1; i<=h; i++){                                       /*o(n) if tree is linear*/
-            printGivenLevel(out, Source, i);
-            if(i!=h){
-                last = true;
-                out.writeUTF("\n");
+        try{
+            int h;
+            if (Source.getKey() == 0)
+                h = (int) Source.getDistance()+1;
+            else {
+                h = maxDepth(Source) + 1;
+                decolor(Source);
             }
-        }
+            for (int i=1; i<=h; i++){
+                printGivenLevel(out, Source, i);
+                if(i!=h){
+                    last = true;
+                    out.writeUTF("\n");
+                }
+            }
+        } catch (NullPointerException e) {}
     }
 
     public void preorderPrint(DataOutputStream out)throws IOException {
         preorderPrintRecursive(out, Source);
+        decolor(Source);
+    }
+
+    protected void decolor(GraphNode s){
+        if (s.getColor() == 0)
+            return;
+        try{
+            s.setColor(0);
+            GraphEdge kid = s.OutEdge.getFront().data;
+            while (kid != null){
+                decolor(kid.Destination);
+                kid = kid.NextEdge;
+            }
+        }
+        catch (NullPointerException e) {return;}
     }
 
     public void preorderPrintRecursive(DataOutputStream out, GraphNode g)throws IOException {
-        if ( g == null || g.getColor()>0)
+        if ( g == null || g.getColor()>1)
             return;
         else {
             if (g.getInDegree() == 0 && g.isExtremeLeft)
@@ -43,7 +63,7 @@ class RootedTree {
             else {
                 out.writeUTF(",");
                 out.writeUTF(String.valueOf(g.getKey()));
-                g.setColor(1);
+                g.setColor(2);
             }
             LinkedListQueue<GraphEdge> kids = g.OutEdge;
             try{
@@ -63,16 +83,18 @@ class RootedTree {
         if (root == null)
             return;
         if (level == 1) {
-            if(!last)
-                out.writeUTF(",");
-            else last = false;
-            root.setColor(0);
-            out.writeUTF(String.valueOf(root.getKey()));
+            if(root.getColor() != 1){
+                if(!last)
+                    out.writeUTF(",");
+                else last = false;
+                out.writeUTF(String.valueOf(root.getKey()));
+            }
+            root.setColor(1);
         }
         else if (level > 1)
         {
-            printGivenLevel(out, root.OutEdge.getFront().data.Destination, level-1);
             try {
+                printGivenLevel(out, root.OutEdge.getFront().data.Destination, level-1);
                 GraphEdge nextEdge = root.OutEdge.getFront().data.NextEdge;
                 while (nextEdge != null) {
                     printGivenLevel(out, nextEdge.Destination, level - 1);
@@ -86,16 +108,23 @@ class RootedTree {
 
     private int maxDepth(GraphNode treeNode) {
         int depth = 0;
-        if (treeNode.OutEdge.getSize() == 0)
-            return depth;
-        else {
-            GraphEdge outers = treeNode.OutEdge.getFront().data;
-            while (outers != null){
-                depth = Math.max(depth, this.maxDepth(outers.Destination));
-                outers = outers.NextEdge;
+        try {
+            if (treeNode.OutEdge.getSize() == 0 || treeNode.getColor() > 0)
+                return depth;
+            else {
+                LinkedListQueue<GraphEdge> outers = treeNode.OutEdge;
+                LinkedListQueue<GraphEdge> temp = new LinkedListQueue<>();
+                GraphEdge kid = outers.dequeue();
+                while (kid!= null){
+                    temp.enqueue(kid);
+                    treeNode.setColor(1);
+                    depth = Math.max(depth, this.maxDepth(kid.Destination));
+                    kid = outers.dequeue();
+                }
+                Queues.transfer(temp, outers);
+                return depth + 1;
             }
-            return depth + 1;
-        }
+        }catch (NullPointerException e){ return 0;}
     }
 
 
