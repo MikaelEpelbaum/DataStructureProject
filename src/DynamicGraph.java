@@ -48,56 +48,28 @@ public class DynamicGraph {
             edge.NextEdge.Previous = null;
     }
 
-//    public RootedTree scc() {
-//        RootedTree rt = new RootedTree();
-//        GraphNode S = new GraphNode(0);
-//        rt.setSource(S);
-//
-//        StackList st = new StackList();
-//
-//        for (int i = 0; i< NodesQueue.getSize(); i++){
-//            GraphNode temp = ((GraphNode) NodesQueue.dequeue());
-//            temp.setColor(0);
-//            NodesQueue.enqueue(temp);
-//        }
-//
-//        LinkedListQueue temp = new LinkedListQueue();
-//        for (int i = 0; i < NodesQueue.getSize(); i++) {
-//            GraphNode sought = (GraphNode) NodesQueue.dequeue();
-//            if (sought.getColor() == 0)
-//                fillOreder(sought, st, temp);
-//            NodesQueue.enqueue(sought);
-//        }
-//
-////        for (int i = 0; i < NodesQueue.getSize(); i++)
-////            ((GraphNode) NodesQueue.getAt(i)).setColor(0);
-//
-//        while (!st.isEmpty()){
-//            GraphNode v = (GraphNode) st.pop();
-//            GraphNode n;
-////            if(v.getColor() == 0) {
-//                GraphEdge ge= null;
-//                try {
-//                    ge = v.OutEdge.getFront().data;
-//                } catch (NullPointerException e){
-//                    n = new GraphNode(v.getKey());
-//                    new GraphEdge(S, n);
-//                }
-//                if(ge != null && ge.Origin!= null) {
-//                    new GraphEdge(S, this.DFSUtil(v));
-//                }
-////            }
-//        }
-//        decolorNodes(rt.Source);
-//        return rt;
-//    }
 
     public RootedTree scc() {
         RootedTree rt = new RootedTree();
+        GraphNode s = new GraphNode(0);
+        rt.setSource(s);
         StackList<GraphNode> st = new StackList<>();
         dfs(masterSource, st);
         Transpose();
-
+        int len = st.queueSize;
+        for(int i = 0; i<len; i++){
+            NodesQueue.enqueue(st.pop());
+        }
+        StackList<GraphNode> st2 = new StackList<>();
+        dfs(masterSource, st2);
+        int max = -1;
+        for(int i = 0; i<len; i++){
+            GraphNode gn = st2.pop();
+            max = (int) Math.max(max, gn.getDistance());
+            s.setDistance(max);
+            if(gn.getDistance() == 1)
+                new GraphEdge(s, gn);
+        }
         return rt;
     }
     public RootedTree bfs(GraphNode source){
