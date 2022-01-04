@@ -38,7 +38,7 @@ class RootedTree {
             }
             LinkedListQueue<GraphEdge> kids = g.OutEdge;
             try{
-                GraphEdge kid = kids.getFront();
+                GraphEdge kid = kids.getFront().data;
                 while (kid != null){
                     preorderPrintRecursive(out, kid.Destination);
                     kid = kid.NextEdge;
@@ -60,9 +60,9 @@ class RootedTree {
         }
         else if (level > 1)
         {
-            printGivenLevel(out, root.OutEdge.getFront().Destination, level-1);
+            printGivenLevel(out, root.OutEdge.getFront().data.Destination, level-1);
             try {
-                GraphEdge nextEdge = root.OutEdge.getFront().NextEdge;
+                GraphEdge nextEdge = root.OutEdge.getFront().data.NextEdge;
                 while (nextEdge != null) {
                     printGivenLevel(out, nextEdge.Destination, level - 1);
                     nextEdge = nextEdge.NextEdge;
@@ -78,7 +78,7 @@ class RootedTree {
         if (treeNode.OutEdge.getSize() == 0)
             return depth;
         else {
-            GraphEdge outers = treeNode.OutEdge.getFront();
+            GraphEdge outers = treeNode.OutEdge.getFront().data;
             while (outers != null){
                 depth = Math.max(depth, this.maxDepth(outers.Destination));
                 outers = outers.NextEdge;

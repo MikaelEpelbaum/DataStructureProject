@@ -13,7 +13,7 @@ public class ArrayList<T> extends LinkedListQueue<T>{
                 } else temp.enqueue(super.dequeue());
                 cnt+=1;
             }
-            Queues.tranfer(temp, this);
+            Queues.transfer(temp, this);
             return val;
         }
         else return null;

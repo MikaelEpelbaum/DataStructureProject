@@ -4,7 +4,7 @@ class LinkedListQueue<T>
     private int queueSize; // queue size
 
     //linked list node
-    private class Node<T>{
+    protected class Node<T>{
         T data;
         Node<T> next;
     }
@@ -21,18 +21,21 @@ class LinkedListQueue<T>
     //check if the queue is empty
     public boolean isEmpty() {return (queueSize == 0);}
     public int getSize(){return queueSize;}
-    public T getFront() throws NullPointerException {
+    public void setSize(int size){this.queueSize = size;}
+    public Node<T> getFront() throws NullPointerException {
         try {
-            return this.front.data;
+            return this.front;
         }
         catch (NullPointerException e) {return null;}
     }
-    public T getRear() throws NullPointerException {
+    public void setFront(Node<T> front) {this.front = front;}
+    public Node<T> getRear() throws NullPointerException {
         try {
-            return this.rear.data;
+            return this.rear;
         }
         catch (NullPointerException e) {return null;}
     }
+    public void setRear(Node<T> rear) {this.rear = rear;}
 
     public void emptyQueue() {
         front = null;
@@ -75,9 +78,13 @@ class LinkedListQueue<T>
 }
 
 class Queues{
-    public static void tranfer(LinkedListQueue from, LinkedListQueue to){
+    public static void transfer(LinkedListQueue from, LinkedListQueue to){
         while (!from.isEmpty()){
-            to.enqueue(from.dequeue());
+            to.setFront(from.getFront());
+            to.setRear(from.getRear());
+            to.setSize(from.getSize());
+            from.emptyQueue();
+//            to.enqueue(from.dequeue());
         }
     }
 }

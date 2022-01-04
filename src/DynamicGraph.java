@@ -1,7 +1,9 @@
 public class DynamicGraph {
 
     GraphNode masterSource;
-    private ArrayList queue;
+    private ArrayList NodesQueue;
+    private ArrayList EdgesQueue;
+
 
     public DynamicGraph() {
     }
@@ -10,8 +12,11 @@ public class DynamicGraph {
         GraphNode n = new GraphNode(nodeKey);
         if (masterSource == null) {
             masterSource = n;
-            queue = new ArrayList();
-        } else queue.enqueue(n);
+            NodesQueue = new ArrayList();
+            EdgesQueue = new ArrayList();
+        }
+        n.isDynamic = true;
+        NodesQueue.enqueue(n);
         return n;
     }
 
@@ -22,12 +27,16 @@ public class DynamicGraph {
     }
 
     public GraphEdge insertEdge(GraphNode from, GraphNode to) {
-        return new GraphEdge(from, to);
+        GraphEdge ge = new GraphEdge(from, to);
+        EdgesQueue.enqueue(ge);
+        ge.isDynamic = true;
+        return ge;
     }
 
     public void deleteEdge(GraphEdge edge) {
         boolean prev = edge.Previous != null;
         boolean next = edge.NextEdge != null;
+        edge.isDynamic = false;
         if (prev && next) {
             edge.Previous.NextEdge = edge.NextEdge;
             edge.NextEdge.Previous = edge.Previous;
@@ -45,24 +54,25 @@ public class DynamicGraph {
 
         StackList st = new StackList();
 
-        for (int i = 0; i< queue.getSize(); i++){
-            GraphNode temp = ((GraphNode) queue.dequeue());
+        for (int i = 0; i< NodesQueue.getSize(); i++){
+            GraphNode temp = ((GraphNode) NodesQueue.dequeue());
             temp.setColor(0);
-            queue.enqueue(temp);
+            NodesQueue.enqueue(temp);
         }
 
         LinkedListQueue temp = new LinkedListQueue();
-        for (int i = 0; i < queue.getSize(); i++) {
-            GraphNode seeked = (GraphNode) queue.getAt(i);
-            if (seeked.getColor() == 0)
-                fillOreder((GraphNode) seeked, st, temp);
+        for (int i = 0; i < NodesQueue.getSize(); i++) {
+            GraphNode sought = (GraphNode) NodesQueue.dequeue();
+            if (sought.getColor() == 0)
+                fillOreder(sought, st, temp);
+            NodesQueue.enqueue(sought);
         }
-        Queues.tranfer(temp, queue);
 
-         DynamicGraph transposed = getTranspose();
+//        Queues.transfer(temp, NodesQueue);
+        DynamicGraph transposed = getTranspose();
 
-        for (int i = 0; i < queue.getSize(); i++)
-            ((GraphNode) queue.getAt(i)).setColor(0);
+        for (int i = 0; i < NodesQueue.getSize(); i++)
+            ((GraphNode) NodesQueue.getAt(i)).setColor(0);
 
         while (!st.isEmpty()){
             GraphNode v = st.pop();
@@ -83,52 +93,84 @@ public class DynamicGraph {
     }
 
     private void fillOreder(GraphNode v, StackList st, LinkedListQueue temp){
-
         try {
             v.setColor(1);
             LinkedListQueue<GraphEdge> kids = v.OutEdge;
+            LinkedListQueue<GraphEdge> kidsTemp = new LinkedListQueue<>();
             GraphEdge kid = kids.dequeue();
-            while (kid.NextEdge != null) {
+            while (kid != null) {
+                kidsTemp.enqueue(kid);
                 temp.enqueue(kid);
                 if (kid.Destination.getColor() == 0)
                     fillOreder(kid.Destination, st, temp);
                 kid = kids.dequeue();
             }
+            Queues.transfer(kidsTemp, v.OutEdge);
             st.push(v);
         } catch (NullPointerException e){return;}
     }
 
     private DynamicGraph getTranspose(){
         DynamicGraph g = new DynamicGraph();
-        for (int i = 0; i < queue.getSize(); i++){
-            GraphNode v = (GraphNode) queue.dequeue();
-            LinkedListQueue<GraphEdge> kids = v.OutEdge;
-            GraphEdge kid = kids.dequeue();
-            while (kid != null){
-                g.queue.enqueue(new GraphEdge(kid.Destination, kid.Origin));
-                kid = kids.dequeue();
+        for (int i = 0; i < NodesQueue.getSize(); i++) {
+            GraphNode v = (GraphNode) NodesQueue.dequeue();
+            GraphNode newV = new GraphNode(v.getKey());
+            g.insertNode(v.getKey());
+            LinkedListQueue<GraphEdge> outers = v.OutEdge;
+            if (outers != null) {
+                try {
+                    GraphEdge kid = outers.getFront().data;
+                    while(kid != null){
+                        //PROBLEM ICI
+                        g.insertEdge(kid.Destination, kid.Origin);
+                        kid = kid.NextEdge;
+                    }
+                }catch (NullPointerException e){}
             }
+//            LinkedListQueue<GraphEdge> inners = v.InEdge;
+//            if (inners != null) {
+//                try {
+//                    GraphEdge kid = inners.getFront().data;
+//                    while(kid != null){
+//                        g.insertEdge(kid.Destination, kid.Origin);
+//                        kid = kid.NextEdge;
+//                    }
+//                }catch (NullPointerException e){}
+//            }
+            NodesQueue.enqueue(v);
         }
+        //        for (int i = 0; i < NodesQueue.getSize(); i++){
+//            GraphNode v = (GraphNode) NodesQueue.dequeue();
+//            LinkedListQueue<GraphEdge> kids = v.OutEdge;
+//            LinkedListQueue<GraphEdge> kidsTemp = new LinkedListQueue<>();
+//            GraphEdge kid = kids.dequeue();
+//            while (kid != null){
+//                kidsTemp.enqueue(kid);
+//                g.EdgesQueue.enqueue(new GraphEdge(kid.Destination, kid.Origin));
+//                kid = kids.dequeue();
+//            }
+//            Queues.transfer(kidsTemp, v.OutEdge);
+//        }
         return g;
     }
 
     private void dfs(GraphNode source){
         LinkedListQueue temp = new LinkedListQueue();
-        while (!queue.isEmpty()){
-            GraphNode head = (GraphNode) queue.dequeue();
+        while (!NodesQueue.isEmpty()){
+            GraphNode head = (GraphNode) NodesQueue.dequeue();
             head.setColor(0);
             head.setParent(null);
             temp.enqueue(head);
         }
-        Queues.tranfer(temp, queue);
+        Queues.transfer(temp, NodesQueue);
         int time = 0;
-        while (!queue.isEmpty()){
-            GraphNode head = (GraphNode) queue.dequeue();
+        while (!NodesQueue.isEmpty()){
+            GraphNode head = (GraphNode) NodesQueue.dequeue();
             if (head.getColor() == 0)
                 DFSVisit(head, time);
             temp.enqueue(head);
         }
-        Queues.tranfer(temp, queue);
+        Queues.transfer(temp, NodesQueue);
     }
 
     private void DFSVisit(GraphNode u, int time){
@@ -171,7 +213,7 @@ public class DynamicGraph {
     }
 
     private void BFSInitialise(GraphNode S, LinkedListQueue q){
-        GraphNode head = (GraphNode) queue.dequeue();
+        GraphNode head = (GraphNode) NodesQueue.dequeue();
         LinkedListQueue temp = new LinkedListQueue();
         try{
         while (head!=null && head != S){
@@ -179,10 +221,10 @@ public class DynamicGraph {
             head.setDistance(Double.POSITIVE_INFINITY);
             head.setParent(null);
             temp.enqueue(head);
-            head = (GraphNode) queue.dequeue();
+            head = (GraphNode) NodesQueue.dequeue();
             }
         } catch (NullPointerException e){}
-        Queues.tranfer(temp, queue);
+        Queues.transfer(temp, NodesQueue);
         S.setColor(1);
         S.setDistance(0);
         S.setParent(null);

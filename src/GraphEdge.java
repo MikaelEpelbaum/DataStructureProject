@@ -4,6 +4,7 @@ public class GraphEdge {
     public GraphNode Destination;
     public GraphEdge NextEdge;
     public GraphEdge Previous;
+    public boolean isDynamic;
 
     public GraphEdge(GraphNode origin, GraphNode destination){
         this.Origin = origin;
@@ -13,8 +14,8 @@ public class GraphEdge {
     }
 
     private void UpdateBelligerent(GraphNode origin, GraphNode destination)throws NullPointerException{
-        this.Previous = origin.OutEdge.getRear();
         try{
+            this.Previous = origin.OutEdge.getRear().data;
             this.Previous.NextEdge = this;
         }
         catch (NullPointerException e) {}
