@@ -95,7 +95,7 @@ class RootedTree {
         {
             try {
                 printGivenLevel(out, root.OutEdge.getFront().data.Destination, level-1);
-                GraphEdge nextEdge = root.OutEdge.getFront().data.NextEdge;
+                GraphEdge nextEdge = root.OutEdge.getFront().next.data;
                 while (nextEdge != null) {
                     printGivenLevel(out, nextEdge.Destination, level - 1);
                     nextEdge = nextEdge.NextEdge;
