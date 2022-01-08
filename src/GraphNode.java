@@ -5,6 +5,8 @@ class GraphNode {
     public LinkedListQueue<GraphEdge> OutEdge;
     public boolean isExtremeLeft;
 
+//    public LinkedListQueue<GraphNode> kids;
+
     public boolean isDynamic;
     private double distance;
     private int retraction;
@@ -33,6 +35,7 @@ class GraphNode {
     public void setColor(int c) {this.color = c;}
     public double getDistance() {return this.distance;}
     public void setDistance(double d) {this.distance = d;}
+    public GraphNode getParent() {return this.parent;}
     public void setParent(GraphNode p) {this.parent = p;}
     public void setRetraction(int t) {this.retraction = t;}
 

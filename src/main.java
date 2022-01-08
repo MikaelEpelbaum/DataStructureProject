@@ -28,6 +28,7 @@ public class main {
         FileOutputStream fo = new FileOutputStream(f);
         DataOutputStream dos = new DataOutputStream(fo);
         rt.printByLayer(dos);
+
 //        rt.preorderPrint(dos);
         fo.close();
         dos.close();

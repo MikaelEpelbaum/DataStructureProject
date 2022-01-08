@@ -92,6 +92,8 @@ public class DynamicGraph {
                     kid.Destination.setDistance(u.getDistance() + 1);
                     kid.Destination.setParent(u);
                 }
+                if(kid.Destination.getColor() != 2)
+                    q.enqueue(kid.Destination);
                 u.OutEdge.enqueue(kid);
             }
             u.setColor(2);

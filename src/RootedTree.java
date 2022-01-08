@@ -36,6 +36,7 @@ class RootedTree {
     }
 
     public void preorderPrint(DataOutputStream out)throws IOException {
+        decolor(Source);
         preorderPrintRecursive(out, Source);
         decolor(Source);
     }
@@ -58,7 +59,7 @@ class RootedTree {
         if ( g == null || g.getColor()>1)
             return;
         else {
-            if (g.getInDegree() == 0 && g.isExtremeLeft)
+            if ((g.getInDegree() == 0 && g.isExtremeLeft) || (g.getParent() == null && g.isExtremeLeft))
                 out.writeUTF(String.valueOf(g.getKey()));
             else {
                 out.writeUTF(",");
@@ -69,7 +70,8 @@ class RootedTree {
             try{
                 GraphEdge kid = kids.getFront().data;
                 while (kid != null){
-                    preorderPrintRecursive(out, kid.Destination);
+                    if(kid.Destination.getParent() == g)
+                        preorderPrintRecursive(out, kid.Destination);
                     kid = kid.NextEdge;
                 }
             }
