@@ -3,6 +3,7 @@ public class DynamicGraph {
     GraphNode masterSource;
     private LinkedListQueue<GraphNode> NodesQueue;
     private LinkedListQueue<GraphEdge> EdgesQueue;
+    private int time;
 
 
     public DynamicGraph() {
@@ -30,22 +31,22 @@ public class DynamicGraph {
     public GraphEdge insertEdge(GraphNode from, GraphNode to) {
         GraphEdge ge = new GraphEdge(from, to);
         EdgesQueue.enqueue(ge);
-        ge.isDynamic = true;
+        ge.deleted = false;
         return ge;
     }
 
     public void deleteEdge(GraphEdge edge) {
-        boolean prev = edge.Previous != null;
-        boolean next = edge.NextEdge != null;
-        edge.isDynamic = false;
-        if (prev && next) {
-            edge.Previous.NextEdge = edge.NextEdge;
-            edge.NextEdge.Previous = edge.Previous;
-        }
-        if (prev && !next)
-            edge.Previous.NextEdge = null;
-        if (!prev && next)
-            edge.NextEdge.Previous = null;
+//        boolean prev = edge.Previous != null;
+//        boolean next = edge.NextEdge != null;
+        edge.deleted = true;
+//        if (prev && next) {
+//            edge.Previous.NextEdge = edge.NextEdge;
+//            edge.NextEdge.Previous = edge.Previous;
+//        }
+//        if (prev && !next)
+//            edge.Previous.NextEdge = null;
+//        if (!prev && next)
+//            edge.NextEdge.Previous = null;
     }
 
 
@@ -54,60 +55,68 @@ public class DynamicGraph {
         GraphNode s = new GraphNode(0);
         rt.setSource(s);
         StackList<GraphNode> st = new StackList<>();
-        dfs(masterSource, st);
+        dfs(st);
         Transpose();
         int len = st.queueSize;
         for(int i = 0; i<len; i++){
-            NodesQueue.enqueue(st.pop());
+            GraphNode temp = st.pop();
+            Queues.revert(temp.OutEdge);
+            NodesQueue.enqueue(temp);
         }
-        StackList<GraphNode> st2 = new StackList<>();
-        dfs(masterSource, st2);
-        LinkedListQueue<GraphNode> temp = new LinkedListQueue<>();
-        int max = -1;
-        for(int i = 0; i<len; i++){
-            GraphNode gn = st2.pop();
-            temp.enqueue(gn);
-            max = (int) Math.max(max, gn.getDistance());
-            s.setDistance(max);
-            if(gn.getDistance() == 1)
+        Queues.revert(NodesQueue);
+        int depth = dfs(st);
+        for(int i = 0; i<len; i++) {
+            GraphNode gn = st.pop();
+//            Queues.revert(gn.OutEdge);
+            if (gn.getParent() == null){
+                gn.setParent(s);
                 new GraphEdge(s, gn);
+            }
         }
-
         // in order to come back to the original layout
-        Transpose();
-        Queues.transfer(temp, NodesQueue);
+//        Transpose();
+//        s.setDistance(depth);
         return rt;
     }
+
     public RootedTree bfs(GraphNode source){
         LinkedListQueue q = new LinkedListQueue();
         BFSInitialise(source, q);
         while (!q.isEmpty()){
             GraphNode u = (GraphNode) q.dequeue();
+            Queues.revert(u.OutEdge);
             LinkedListQueue<GraphEdge> kids = u.OutEdge;
             int len = kids.queueSize;
-            for (int i = 0; i<len; i++){ //while (kid != null){
+            for (int i = 0; i<len; i++){
                 GraphEdge kid = kids.dequeue();
-                if (kid.Destination.getColor() == 0){
-                    kid.Destination.setColor(1);
-                    kid.Destination.setDistance(u.getDistance() + 1);
-                    kid.Destination.setParent(u);
+                if(!kid.deleted) {
+                    if (kid.Destination.getColor() == 0) {
+                        kid.Destination.setColor(1);
+                        kid.Destination.setDistance(u.getDistance() + 1);
+                        kid.Destination.setParent(u);
+                    }
+                    if (kid.Destination.getColor() != 2)
+                        q.enqueue(kid.Destination);
+                    u.OutEdge.enqueue(kid);
                 }
-                if(kid.Destination.getColor() != 2)
-                    q.enqueue(kid.Destination);
-                u.OutEdge.enqueue(kid);
             }
+//            Queues.revert(u.OutEdge);
             u.setColor(2);
         }
         RootedTree rt = new RootedTree();
         rt.setSource(source);
-        rt.decolor(source);
+        rt.discolor(source);
         return rt;
     }
 
     private void Transpose(){
         int EdgesLen = EdgesQueue.getSize();
         for (int i = 0; i < EdgesLen; i++){
-            EdgesQueue.enqueue(EdgesQueue.dequeue().inverse());
+            GraphEdge temp = EdgesQueue.dequeue();
+            if(!temp.deleted) {
+                temp.inverse();
+                EdgesQueue.enqueue(temp);
+            }
         }
         int NodesLen = NodesQueue.getSize();
         for (int i = 0; i < NodesLen; i++){
@@ -116,62 +125,78 @@ public class DynamicGraph {
             Queues.transfer(temp.InEdge, tempIn);
             Queues.transfer(temp.OutEdge, temp.InEdge);
             Queues.transfer(tempIn, temp.OutEdge);
+//            NodesQueue.enqueue(temp);
         }
     }
 
-    private void dfs(GraphNode source, StackList<GraphNode> st){
-        LinkedListQueue<GraphNode> temp = new LinkedListQueue();
-        while (!NodesQueue.isEmpty()){
+    private int dfs(StackList<GraphNode> st){
+        int len = NodesQueue.getSize();
+        for(int i =0; i< len; i++){
             GraphNode head = (GraphNode) NodesQueue.dequeue();
             head.setColor(0);
             head.setParent(null);
-            temp.enqueue(head);
+            NodesQueue.enqueue(head);
         }
-        Queues.transfer(temp, NodesQueue);
-        int time = 0;
-        while (!NodesQueue.isEmpty()){
+        Queues.revert(NodesQueue);
+        this.time = 0;
+        int max = 0;
+        for(int i =0; i< len; i++){
             GraphNode head = (GraphNode) NodesQueue.dequeue();
+            NodesQueue.enqueue(head);
             if (head.getColor() == 0)
-                DFSVisit(head, time, st);
-            temp.enqueue(head);
+                max = Math.max(max, DFSVisit(head, st, max));
         }
-        Queues.transfer(temp, NodesQueue);
+        return max;
     }
 
-    private void DFSVisit(GraphNode u, int time, StackList<GraphNode> st){
-        time +=1;
-        u.setDistance(time);
+    private int DFSVisit(GraphNode u, StackList<GraphNode> st, int m){
+        this.time +=1;
+        u.setDistance(this.time);
         u.setColor(1);
-        LinkedListQueue<GraphEdge> kids = u.OutEdge;
-        LinkedListQueue<GraphEdge> temp = new LinkedListQueue<>();
-        GraphEdge kid = kids.dequeue();
-        while (kid != null){
-            temp.enqueue(kid);
-            if(kid.Destination.getColor() == 0){
-                kid.Destination.setParent(u);
-                DFSVisit(kid.Destination, time, st);
+//        Queues.revert(u.OutEdge);
+        int len = u.OutEdge.getSize();
+        LinkedListQueue.Node node = u.OutEdge.getFront();
+        for(int i =0; i< len; i++){
+            GraphEdge kid = (GraphEdge) node.data;
+            if(!kid.deleted) {
+//                u.OutEdge.enqueue(kid);
+                if (kid.Destination.getColor() == 0) {
+                    kid.Destination.setParent(u);
+                    m+= DFSVisit(kid.Destination, st, m) + 1;
+                }
             }
-            kid = kids.dequeue();
+            node = node.next;
         }
-        Queues.transfer(temp, u.OutEdge);
+//        LinkedListQueue<GraphEdge> kids = u.OutEdge;
+//        LinkedListQueue<GraphEdge> temp = new LinkedListQueue<>();
+//        GraphEdge kid = kids.dequeue();
+//        while (kid != null){
+//            temp.enqueue(kid);
+//            if(kid.Destination.getColor() == 0){
+//                kid.Destination.setParent(u);
+//                DFSVisit(kid.Destination, time, st);
+//            }
+//            kid = kids.dequeue();
+//        }
+//        Queues.transfer(temp, u.OutEdge);
         u.setColor(2);
-        time +=1;
-        u.setRetraction(time);
+        this.time +=1;
+        u.setRetraction(this.time);
         st.push(u);
+        return m;
     }
 
     private void BFSInitialise(GraphNode S, LinkedListQueue q){
         int len = NodesQueue.getSize();
-        GraphNode head = (GraphNode) NodesQueue.dequeue();
         try{
         for (int i = 0; i< len; i++) {
+            GraphNode head = (GraphNode) NodesQueue.dequeue();
             NodesQueue.enqueue(head);
             if (head != null && head != S) {
                 head.setColor(0);
                 head.setDistance(Double.POSITIVE_INFINITY);
                 head.setParent(null);
             }
-            head = (GraphNode) NodesQueue.dequeue();
         }
         } catch (NullPointerException e){}
         S.setColor(1);

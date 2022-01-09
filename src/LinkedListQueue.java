@@ -86,4 +86,14 @@ class Queues{
             from.emptyQueue();
         }
     }
+
+    public static void revert(LinkedListQueue queue) {
+        StackList st = new StackList();
+        int len = queue.getSize();
+        for (int i= 0; i < len; i++)
+            st.push(queue.dequeue());
+        for (int i= 0; i < len; i++)
+            queue.enqueue(st.pop());
+//        return queue;
+    }
 }
