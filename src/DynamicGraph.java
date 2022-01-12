@@ -76,6 +76,7 @@ public class DynamicGraph {
             GraphNode u = (GraphNode) q.dequeue();
             if(!u.deleted) {
                 LinkedListQueue<GraphEdge> kids = u.OutEdge;
+                Queues.revert(kids);
                 int len = kids.queueSize;
                 for (int i = 0; i < len; i++) {
                     GraphEdge kid = kids.dequeue();
@@ -91,6 +92,7 @@ public class DynamicGraph {
                     }
                 }
                 u.setColor(2);
+                Queues.revert(kids);
             }
         }
         RootedTree rt = new RootedTree();

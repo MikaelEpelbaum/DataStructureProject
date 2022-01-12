@@ -42,6 +42,7 @@ class RootedTree {
         if ( g == null || g.getColor()>1)
             return;
         else {
+            //region Printings
             if ((g.getInDegree() == 0 && g.isExtremeLeft) || (g.getParent() == null && g.isExtremeLeft)) {
                 out.writeBytes(String.valueOf(g.getKey()));
 //                out.writeUTF(String.valueOf(g.getKey()));
@@ -53,14 +54,16 @@ class RootedTree {
 //                out.writeUTF(String.valueOf(g.getKey()));
                 g.setColor(2);
             }
+            //endregion
             try{
                 Queues.revert(g.OutEdge);
                 int len = g.OutEdge.getSize();
                 for(int i = 0; i< len; i++){
                     GraphEdge edge = g.OutEdge.dequeue();
                     g.OutEdge.enqueue(edge);
-                    if(g == edge.Destination.getParent())
+                    if(g == edge.Destination.getParent()) {
                         preorderPrintRecursive(out, edge.Destination);
+                    }
                 }
                 Queues.revert(g.OutEdge);
             }
@@ -111,7 +114,9 @@ class RootedTree {
                     for(int i = 0; i < len; i++){
                         GraphEdge edge = root.OutEdge.dequeue();
                         root.OutEdge.enqueue(edge);
-//                        if(root == edge.Destination.getParent())
+                        if(edge.Destination.getColor() < 1 && level == 2)
+                            printGivenLevel(out, edge.Destination, level - 1);
+                        if(level > 2)
                             printGivenLevel(out, edge.Destination, level - 1);
                     }
                     Queues.revert(root.OutEdge);
@@ -122,19 +127,39 @@ class RootedTree {
     }
 
 
-    private int maxDepth(GraphNode s) {
-        int depth = 0;
-            if (s.OutEdge.isEmpty() || s.getColor() > 0)
-                return depth;
-            else {
-                int len = s.OutEdge.getSize();
-                for (int i = 0; i< len; i++){
-                    GraphEdge edge = s.OutEdge.dequeue();
-                    s.OutEdge.enqueue(edge);
-                    s.setColor(1);
-                    depth = Math.max(depth, this.maxDepth(edge.Destination));
+//    private int maxDepth(GraphNode s) {
+//        int depth = 0;
+//        if (s.OutEdge.isEmpty() || s.getColor() > 0)
+//            return depth;
+//        else {
+//            int len = s.OutEdge.getSize();
+//            for (int i = 0; i< len; i++){
+//                GraphEdge edge = s.OutEdge.dequeue();
+//                if(!edge.deleted){
+//                    s.OutEdge.enqueue(edge);
+//                    s.setColor(1);
+//                    if(!edge.Destination.deleted)
+//                        depth = Math.max(depth, this.maxDepth(edge.Destination));
+//                }
+//            }
+//            return depth+1;
+//        }
+//    }
+    private int maxDepth(GraphNode s){
+        int depth = (int) s.getDistance();
+        int len = s.OutEdge.getSize();
+        LinkedListQueue.Node node = s.OutEdge.getFront();
+        for (int i = 0; i< len; i++){
+            GraphEdge edge = (GraphEdge) node.data;
+            if(!edge.deleted && !edge.Destination.deleted){
+                int temp = 0;
+                if(s.getDistance() < edge.Destination.getDistance()) {
+                    temp = maxDepth(edge.Destination);
                 }
-                return depth+1;
+                depth = Math.max(depth, temp);
             }
+            node = node.next;
         }
+        return depth;
+    }
 }
