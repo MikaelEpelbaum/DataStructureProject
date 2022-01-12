@@ -4,10 +4,7 @@ class GraphNode {
     public LinkedListQueue<GraphEdge> InEdge;
     public LinkedListQueue<GraphEdge> OutEdge;
     public boolean isExtremeLeft;
-
-//    public LinkedListQueue<GraphNode> kids;
-
-    public boolean isDynamic;
+    public boolean deleted;
     private double distance;
     private int retraction;
     private GraphNode parent;
@@ -20,9 +17,9 @@ class GraphNode {
 
     public GraphNode(int nodeKey){
         this.Key = nodeKey;
-        InEdge = new LinkedListQueue<>();
-        OutEdge = new LinkedListQueue<>();
-        isDynamic = true;
+        this.InEdge = new LinkedListQueue<>();
+        this.OutEdge = new LinkedListQueue<>();
+        this.deleted = true;
     }
 
     public void setExtreme() {

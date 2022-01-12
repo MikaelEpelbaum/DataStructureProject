@@ -18,16 +18,9 @@ class RootedTree {
     /* Function to line by line print level order traversal a tree*/
     public void printByLayer(DataOutputStream out)throws IOException{
         try{
-            int h;
-            if (Source.getKey() == 0){
-//                h = Double.valueOf(Source.getDistance()).intValue()+1;
-                discolor(Source);
-                h = maxDepth(Source)+1;
-            }
-            else {
-                h = maxDepth(Source)+1;
-            }
+            int h = maxDepth(Source)+1;
             discolor(Source);
+
             for (int i=1; i<=h; i++){
                 printGivenLevel(out, Source, i);
                 if(i!=h){
@@ -43,23 +36,6 @@ class RootedTree {
         discolor(Source);
         preorderPrintRecursive(out, Source);
 //        discolor(Source);
-    }
-
-    protected void discolor(GraphNode s){
-        if (s.getColor() == 0 && s.getKey() != 0)
-            return;
-        try{
-            s.setColor(0);
-            int len = s.OutEdge.getSize();
-            for (int i = 0; i< len; i++){
-                GraphEdge edge = s.OutEdge.dequeue();
-                if(!edge.deleted) {
-                    s.OutEdge.enqueue(edge);
-                    discolor(edge.Destination);
-                }
-            }
-        }
-        catch (NullPointerException e) {return;}
     }
 
     public void preorderPrintRecursive(DataOutputStream out, GraphNode g)throws IOException {
@@ -92,6 +68,22 @@ class RootedTree {
         }
     }
 
+    protected void discolor(GraphNode s){
+        if (s.getColor() == 0 && s.getKey() != 0)
+            return;
+        try{
+            s.setColor(0);
+            int len = s.OutEdge.getSize();
+            for (int i = 0; i< len; i++){
+                GraphEdge edge = s.OutEdge.dequeue();
+                if(!edge.deleted) {
+                    s.OutEdge.enqueue(edge);
+                    discolor(edge.Destination);
+                }
+            }
+        }
+        catch (NullPointerException e) {return;}
+    }
 
     /* Print nodes at a given level */
     private void printGivenLevel(DataOutputStream out, GraphNode root, int level)throws IOException{
@@ -119,7 +111,7 @@ class RootedTree {
                     for(int i = 0; i < len; i++){
                         GraphEdge edge = root.OutEdge.dequeue();
                         root.OutEdge.enqueue(edge);
-                        if(root == edge.Destination.getParent())
+//                        if(root == edge.Destination.getParent())
                             printGivenLevel(out, edge.Destination, level - 1);
                     }
                     Queues.revert(root.OutEdge);
