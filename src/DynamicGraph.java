@@ -3,7 +3,6 @@ public class DynamicGraph {
     GraphNode masterSource;
     private LinkedListQueue<GraphNode> NodesQueue;
     private LinkedListQueue<GraphEdge> EdgesQueue;
-    private int time;
 
 
     public DynamicGraph() {
@@ -40,9 +39,6 @@ public class DynamicGraph {
 
 
     public RootedTree scc() {
-        RootedTree rt = new RootedTree();
-        GraphNode s = new GraphNode(0);
-        rt.setSource(s);
         StackList<GraphNode> st = new StackList<>();
         dfs(st);
         Transpose();
@@ -64,6 +60,9 @@ public class DynamicGraph {
             NodesQueue.enqueue(gn);
         }
         Queues.revert(NodesQueue);
+        RootedTree rt = new RootedTree();
+        GraphNode s = new GraphNode(0);
+        rt.setSource(s);
         for(int i = 0; i<len; i++) {
             GraphNode gn = NodesQueue.dequeue();
             NodesQueue.enqueue(gn);
@@ -126,6 +125,8 @@ public class DynamicGraph {
         }
     }
 
+    private int time;
+
     private void dfs(StackList<GraphNode> st){
         int len = NodesQueue.getSize();
         for(int i =0; i< len; i++){
@@ -137,7 +138,7 @@ public class DynamicGraph {
                 NodesQueue.enqueue(head);
             }
         }
-//        Queues.revert(NodesQueue);
+        len = NodesQueue.getSize();
         this.time = 0;
         for(int i =0; i< len; i++){
             GraphNode head = (GraphNode) NodesQueue.dequeue();
@@ -150,7 +151,7 @@ public class DynamicGraph {
 
     private void DFSVisit(GraphNode u, StackList<GraphNode> st){
         this.time +=1;
-//        u.setDistance(this.time);
+        u.setDistance(time);
         u.setColor(1);
         Queues.revert(u.OutEdge);
         int len = u.OutEdge.getSize();
@@ -158,7 +159,6 @@ public class DynamicGraph {
         for(int i =0; i< len; i++){
             GraphEdge kid = (GraphEdge) node.data;
             if(!kid.deleted) {
-//                u.OutEdge.enqueue(kid);
                 if (kid.Destination.getColor() == 0) {
                     kid.Destination.setParent(u);
                     kid.Destination.setDistance(u.getDistance()+1);
@@ -170,7 +170,7 @@ public class DynamicGraph {
         u.setColor(2);
         Queues.revert(u.OutEdge);
         this.time +=1;
-        u.setRetraction(this.time);
+        u.setRetraction(time);
         st.push(u);
     }
 

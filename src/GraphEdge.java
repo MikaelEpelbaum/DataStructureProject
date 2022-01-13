@@ -1,10 +1,10 @@
-public class GraphEdge extends Gen {
+public class GraphEdge {
 
     public GraphNode Origin;
     public GraphNode Destination;
 
     public boolean hasPrevious;
-//    public boolean deleted;
+    public boolean deleted;
 
     public GraphEdge(GraphNode origin, GraphNode destination){
         this.Origin = origin;
