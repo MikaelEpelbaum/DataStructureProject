@@ -1,10 +1,10 @@
-class GraphNode {
+class GraphNode extends Gen {
 
     private int Key;
     public LinkedListQueue<GraphEdge> InEdge;
     public LinkedListQueue<GraphEdge> OutEdge;
     public boolean isExtremeLeft;
-    public boolean deleted;
+//    public boolean deleted;
     private double distance;
     private int retraction;
     private GraphNode parent;

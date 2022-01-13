@@ -49,23 +49,29 @@ public class DynamicGraph {
         int len = st.queueSize;
         for(int i = 0; i<len; i++){
             GraphNode temp = st.pop();
+            if(temp.deleted)
+                continue;
             Queues.revert(temp.OutEdge);
             NodesQueue.enqueue(temp);
         }
+        len = NodesQueue.queueSize;
         Queues.revert(NodesQueue);
         dfs(st);
-
+        // in order to come back to the original layout
+        Transpose();
         for(int i = 0; i<len; i++) {
             GraphNode gn = st.pop();
-//            Queues.revert(gn.OutEdge);
+            NodesQueue.enqueue(gn);
+        }
+        Queues.revert(NodesQueue);
+        for(int i = 0; i<len; i++) {
+            GraphNode gn = NodesQueue.dequeue();
+            NodesQueue.enqueue(gn);
             if (gn.getParent() == null){
                 gn.setParent(s);
-                new GraphEdge(s, gn);
+                new GraphEdge(gn, s);
             }
         }
-        // in order to come back to the original layout
-//        Transpose();
-//        s.setDistance(depth);
         return rt;
     }
 
@@ -117,7 +123,6 @@ public class DynamicGraph {
             Queues.transfer(temp.InEdge, tempIn);
             Queues.transfer(temp.OutEdge, temp.InEdge);
             Queues.transfer(tempIn, temp.OutEdge);
-//            NodesQueue.enqueue(temp);
         }
     }
 
@@ -125,25 +130,29 @@ public class DynamicGraph {
         int len = NodesQueue.getSize();
         for(int i =0; i< len; i++){
             GraphNode head = (GraphNode) NodesQueue.dequeue();
-            head.setColor(0);
-            head.setParent(null);
-            NodesQueue.enqueue(head);
+            if(!head.deleted) {
+                head.setColor(0);
+                head.setDistance(1);
+                head.setParent(null);
+                NodesQueue.enqueue(head);
+            }
         }
-        Queues.revert(NodesQueue);
+//        Queues.revert(NodesQueue);
         this.time = 0;
         for(int i =0; i< len; i++){
             GraphNode head = (GraphNode) NodesQueue.dequeue();
             NodesQueue.enqueue(head);
-            if (head.getColor() == 0)
+            if (head.getColor() == 0) {
                 DFSVisit(head, st);
+            }
         }
     }
 
     private void DFSVisit(GraphNode u, StackList<GraphNode> st){
         this.time +=1;
-        u.setDistance(this.time);
+//        u.setDistance(this.time);
         u.setColor(1);
-//        Queues.revert(u.OutEdge);
+        Queues.revert(u.OutEdge);
         int len = u.OutEdge.getSize();
         LinkedListQueue.Node node = u.OutEdge.getFront();
         for(int i =0; i< len; i++){
@@ -152,12 +161,14 @@ public class DynamicGraph {
 //                u.OutEdge.enqueue(kid);
                 if (kid.Destination.getColor() == 0) {
                     kid.Destination.setParent(u);
+                    kid.Destination.setDistance(u.getDistance()+1);
                     DFSVisit(kid.Destination, st);
                 }
             }
             node = node.next;
         }
         u.setColor(2);
+        Queues.revert(u.OutEdge);
         this.time +=1;
         u.setRetraction(this.time);
         st.push(u);
