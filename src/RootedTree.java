@@ -26,8 +26,6 @@ class RootedTree {
             }
             else{
                 discolorSCC(Source);
-                setParents(Source);
-                discolorSCC(Source);
                 h = maxDepthSCC(Source);
                 discolorSCC(Source);
             }
@@ -53,15 +51,13 @@ class RootedTree {
         else {
             discolorSCC(Source);
             preorderPrintRecursiveSCC(out, Source);
+            GraphEdge kid = Source.InEdge.dequeue();
+            while(kid != null){
+                kid.deleted = true;
+                kid = Source.InEdge.dequeue();
+            }
+            Source.deleted = true;
         }
-        int len = Source.InEdge.getSize();
-        LinkedListQueue.Node node = Source.InEdge.getFront();
-        for(int i = 0; i < len; i++){
-            GraphEdge ge = (GraphEdge) node.data;
-            ge.deleted = true;
-            node = node.next;
-        }
-
     }
 
     public void preorderPrintRecursive(DataOutputStream out, GraphNode g)throws IOException {
@@ -82,8 +78,8 @@ class RootedTree {
             }
             //endregion
             try{
-                Queues.revert(g.OutEdge);
                 int len = g.OutEdge.getSize();
+                Queues.revert(g.OutEdge);
                 for(int i = 0; i< len; i++){
                     GraphEdge edge = g.OutEdge.dequeue();
                     g.OutEdge.enqueue(edge);
@@ -115,7 +111,6 @@ class RootedTree {
             }
             //endregion
             try{
-//                Queues.revert(g.InEdge);
                 int len = g.InEdge.getSize();
                 for(int i = 0; i< len; i++){
                     GraphEdge edge = g.InEdge.dequeue();
@@ -211,7 +206,7 @@ class RootedTree {
                     LinkedListQueue.Node node = root.InEdge.getFront();
                     for(int i = 0; i < len; i++){
                         GraphEdge edge = (GraphEdge) node.data;
-                        if(edge.Origin.getParent() == root)
+                        if(edge.Origin.getParent() == root && !edge.deleted)
                         printGivenLevelSCC(out, edge.Origin, level - 1);
                         node = node.next;
                     }
@@ -267,8 +262,10 @@ class RootedTree {
             for (int i = 0; i< len; i++){
                 GraphEdge edge = s.InEdge.dequeue();
                 s.InEdge.enqueue(edge);
-                if(edge.Origin.getColor() < 1) {
-                    depth = Math.max(depth, this.maxDepthSCC(edge.Origin));
+                if(!edge.deleted) {
+                    if (edge.Origin.getColor() < 1) {
+                        depth = Math.max(depth, this.maxDepthSCC(edge.Origin));
+                    }
                 }
             }
             return depth+1;
@@ -292,22 +289,22 @@ class RootedTree {
         catch (NullPointerException e) {return;}
     }
 
-    protected void setParents(GraphNode s){
-        if (s.getColor() == 1 && s.getKey() != 0)
-            return;
-        try{
-            s.setColor(1);
-            int len = s.InEdge.getSize();
-            for (int i = 0; i< len; i++){
-                GraphEdge edge = s.InEdge.dequeue();
-                s.InEdge.enqueue(edge);
-                if(!edge.deleted && edge.Origin.getColor() < 1) {
-                    edge.Origin.setParent(s);
-                    setParents(edge.Origin);
-                }
-            }
-        }
-        catch (NullPointerException e) {return;}
-    }
+//    protected void setParents(GraphNode s){
+//        if (s.getColor() == 1 && s.getKey() != 0)
+//            return;
+//        try{
+//            s.setColor(1);
+//            int len = s.InEdge.getSize();
+//            for (int i = 0; i< len; i++){
+//                GraphEdge edge = s.InEdge.dequeue();
+//                s.InEdge.enqueue(edge);
+//                if(!edge.deleted && edge.Origin.getColor() < 1) {
+//                    edge.Origin.setParent(s);
+//                    setParents(edge.Origin);
+//                }
+//            }
+//        }
+//        catch (NullPointerException e) {return;}
+//    }
 
 }

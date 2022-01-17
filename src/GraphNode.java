@@ -19,7 +19,7 @@ class GraphNode {
         this.Key = nodeKey;
         this.InEdge = new LinkedListQueue<>();
         this.OutEdge = new LinkedListQueue<>();
-        this.deleted = true;
+        this.deleted = false;
     }
 
     public void setExtreme() {
