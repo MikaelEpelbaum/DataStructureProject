@@ -29,8 +29,6 @@ public class main {
         llr4.setParent(l2);
 
 
-
-
         File f = new File("test.txt");
         FileOutputStream fo = new FileOutputStream(f);
         DataOutputStream dos = new DataOutputStream(fo);
