@@ -30,11 +30,15 @@ public class DynamicGraph {
         GraphEdge ge = new GraphEdge(from, to);
         EdgesQueue.enqueue(ge);
         ge.deleted = false;
+        from.out++;
+        to.in++;
         return ge;
     }
 
     public void deleteEdge(GraphEdge edge) {
         edge.deleted = true;
+        edge.Origin.out--;
+        edge.Destination.in--;
     }
 
 

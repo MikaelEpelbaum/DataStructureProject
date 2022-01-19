@@ -96,8 +96,6 @@ class RootedTree {
     }
 
     public void preorderPrintRecursiveSCC(DataOutputStream out, GraphNode g)throws IOException {
-//        if(g.getKey() == 599736)
-//            System.out.println();
         if ( g == null || g.getColor()>1)
             return;
         else {
@@ -253,9 +251,6 @@ class RootedTree {
                 if(!edge.deleted) {
                     if(edge.Origin.getParent() == s)
                         depth = Math.max(depth, this.maxDepthSCC(edge.Origin));
-//                    if (edge.Origin.getColor() < 1) {
-//                        depth = Math.max(depth, this.maxDepthSCC(edge.Origin));
-//                    }
                 }
             }
             return depth+1;

@@ -7,6 +7,8 @@ class GraphNode {
     public boolean deleted;
     private double distance;
     private int retraction;
+    int in;
+    int out;
     private GraphNode parent;
     private int color;
    /*
@@ -20,6 +22,8 @@ class GraphNode {
         this.InEdge = new LinkedListQueue<>();
         this.OutEdge = new LinkedListQueue<>();
         this.deleted = false;
+        this.in = 0;
+        this.out = 0;
     }
 
     public void setExtreme() {
@@ -37,9 +41,9 @@ class GraphNode {
     public void setRetraction(int t) {this.retraction = t;}
 
     public int getOutDegree(){
-        return this.OutEdge.getSize();
+        return this.out;
     }
     public int getInDegree(){
-        return this.InEdge.getSize();
+        return this.in;
     }
 }
