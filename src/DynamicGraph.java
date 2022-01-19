@@ -163,7 +163,10 @@ public class DynamicGraph {
             node = node.next;
         }
         u.setColor(2);
-        Queues.revert(u.OutEdge);
+        if(FirstDFS)
+            Queues.revert(u.OutEdge);
+        else
+            Queues.revert(u.InEdge);
         this.time +=1;
         u.setRetraction(time);
         st.push(u);

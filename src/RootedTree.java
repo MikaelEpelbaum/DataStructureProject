@@ -1,3 +1,5 @@
+import com.sun.jdi.connect.spi.TransportService;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -94,27 +96,22 @@ class RootedTree {
     }
 
     public void preorderPrintRecursiveSCC(DataOutputStream out, GraphNode g)throws IOException {
+//        if(g.getKey() == 599736)
+//            System.out.println();
         if ( g == null || g.getColor()>1)
             return;
-        if(g.getKey() == 704420)
-            System.out.println();
         else {
             if(g.getKey() == 0)
                 out.writeBytes(String.valueOf(g.getKey()));
-            //region Printings
-//            if ((g.getInDegree() == 0 && g.isExtremeLeft) || (g.getParent() == null && g.isExtremeLeft)) {
-//                out.writeBytes(String.valueOf(g.getKey()));
-////                out.writeUTF(String.valueOf(g.getKey()));
-//            }
             else {
                 out.writeBytes(",");
                 out.writeBytes(String.valueOf(g.getKey()));
-//                out.writeUTF(",");
-//                out.writeUTF(String.valueOf(g.getKey()));
                 g.setColor(2);
             }
             //endregion
             try{
+                if(g.getKey() != 0)
+                    Queues.revert(g.InEdge);
                 int len = g.InEdge.getSize();
                 for(int i = 0; i< len; i++){
                     GraphEdge edge = g.InEdge.dequeue();
@@ -123,11 +120,13 @@ class RootedTree {
                         preorderPrintRecursiveSCC(out, edge.Origin);
                     }
                 }
-//                Queues.revert(g.InEdge);
+                if(g.getKey() != 0)
+                    Queues.revert(g.InEdge);
             }
             catch (NullPointerException e) {return;}
         }
     }
+
 
     protected void discolor(GraphNode s){
         if (s.getColor() == 0 && s.getKey() != 0)
@@ -145,7 +144,6 @@ class RootedTree {
         }
         catch (NullPointerException e) {return;}
     }
-
 
 
     /* Print nodes at a given level */
@@ -206,6 +204,8 @@ class RootedTree {
         {
             try {
                 if (!root.InEdge.isEmpty()) {
+                    if(root.getKey() != 0)
+                        Queues.revert(root.InEdge);
                     int len = root.InEdge.getSize();
                     LinkedListQueue.Node node = root.InEdge.getFront();
                     for(int i = 0; i < len; i++){
@@ -214,6 +214,8 @@ class RootedTree {
                         printGivenLevelSCC(out, edge.Origin, level - 1);
                         node = node.next;
                     }
+                    if(root.getKey() != 0)
+                        Queues.revert(root.InEdge);
                 }
             }
             catch (NullPointerException e) {return;}
@@ -238,24 +240,6 @@ class RootedTree {
         return depth;
     }
 
-//    private int maxDepthSCC(GraphNode s){
-//        int depth = (int) s.getDistance();
-//        int len = s.InEdge.getSize();
-//        LinkedListQueue.Node node = s.InEdge.getFront();
-//        for (int i = 0; i< len; i++){
-//            GraphEdge edge = (GraphEdge) node.data;
-//            if(!edge.deleted && !edge.Origin.deleted){
-//                int temp = 0;
-//                if(s.getDistance() < edge.Origin.getDistance()) {
-//                    temp = maxDepthSCC(edge.Origin);
-//                }
-//                depth = Math.max(depth, temp);
-//            }
-//            node = node.next;
-//        }
-//        return depth;
-//    }
-
     private int maxDepthSCC(GraphNode s) {
         int depth = 0;
         if (s.InEdge.isEmpty() || s.getColor() > 0)
@@ -267,9 +251,11 @@ class RootedTree {
                 GraphEdge edge = s.InEdge.dequeue();
                 s.InEdge.enqueue(edge);
                 if(!edge.deleted) {
-                    if (edge.Origin.getColor() < 1) {
+                    if(edge.Origin.getParent() == s)
                         depth = Math.max(depth, this.maxDepthSCC(edge.Origin));
-                    }
+//                    if (edge.Origin.getColor() < 1) {
+//                        depth = Math.max(depth, this.maxDepthSCC(edge.Origin));
+//                    }
                 }
             }
             return depth+1;
@@ -292,23 +278,5 @@ class RootedTree {
         }
         catch (NullPointerException e) {return;}
     }
-
-//    protected void setParents(GraphNode s){
-//        if (s.getColor() == 1 && s.getKey() != 0)
-//            return;
-//        try{
-//            s.setColor(1);
-//            int len = s.InEdge.getSize();
-//            for (int i = 0; i< len; i++){
-//                GraphEdge edge = s.InEdge.dequeue();
-//                s.InEdge.enqueue(edge);
-//                if(!edge.deleted && edge.Origin.getColor() < 1) {
-//                    edge.Origin.setParent(s);
-//                    setParents(edge.Origin);
-//                }
-//            }
-//        }
-//        catch (NullPointerException e) {return;}
-//    }
 
 }
