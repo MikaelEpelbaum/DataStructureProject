@@ -96,12 +96,16 @@ class RootedTree {
     public void preorderPrintRecursiveSCC(DataOutputStream out, GraphNode g)throws IOException {
         if ( g == null || g.getColor()>1)
             return;
+        if(g.getKey() == 704420)
+            System.out.println();
         else {
-            //region Printings
-            if ((g.getInDegree() == 0 && g.isExtremeLeft) || (g.getParent() == null && g.isExtremeLeft)) {
+            if(g.getKey() == 0)
                 out.writeBytes(String.valueOf(g.getKey()));
-//                out.writeUTF(String.valueOf(g.getKey()));
-            }
+            //region Printings
+//            if ((g.getInDegree() == 0 && g.isExtremeLeft) || (g.getParent() == null && g.isExtremeLeft)) {
+//                out.writeBytes(String.valueOf(g.getKey()));
+////                out.writeUTF(String.valueOf(g.getKey()));
+//            }
             else {
                 out.writeBytes(",");
                 out.writeBytes(String.valueOf(g.getKey()));

@@ -60,17 +60,12 @@ public class DynamicGraph {
         }
         Queues.revert(NodesCopy);
         dfs(st, NodesCopy, false);
-//        stLen = st.queueSize;
-//        for(int i = 0; i<stLen; i++) {
-//            GraphNode gn = st.pop();
-//            NodesCopy.enqueue(gn);
-//        }
         RootedTree rt = new RootedTree();
         GraphNode s = new GraphNode(0);
         rt.setSource(s);
         for(int i = 0; i<stLen; i++) {
             GraphNode gn = NodesCopy2.dequeue();
-            if (gn.getParent() == null){
+                if (gn.getParent() == null){
                 gn.setParent(s);
                 new GraphEdge(gn, s);
             }
@@ -138,8 +133,8 @@ public class DynamicGraph {
         int len;
         LinkedListQueue.Node node;
         if(FirstDFS){
-
             len = u.OutEdge.getSize();
+            Queues.revert(u.OutEdge);
             node = u.OutEdge.getFront();
         }
         else {
@@ -158,6 +153,7 @@ public class DynamicGraph {
                     }
                 }
                 else {
+
                     if (kid.Origin.getColor() < 1) {
                         kid.Origin.setParent(u);
                         DFSVisit(kid.Origin, st, FirstDFS);
