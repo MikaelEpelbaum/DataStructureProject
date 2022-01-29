@@ -93,6 +93,7 @@ public class DynamicGraph {
                         kid.Destination.setColor(1);
                         kid.Destination.setDistance(u.getDistance() + 1);
                         kid.Destination.setParent(u);
+                        u.sons.enqueue(kid.Destination);
                         q.enqueue(kid.Destination);
                     }
                 }
@@ -117,6 +118,7 @@ public class DynamicGraph {
                 head.setColor(0);
                 head.setDistance(1);
                 head.setParent(null);
+                head.sons = new LinkedListQueue<>();
                 nodes.enqueue(head);
             }
         }
@@ -157,8 +159,8 @@ public class DynamicGraph {
                     }
                 }
                 else {
-
                     if (kid.Origin.getColor() < 1) {
+                        u.sons.enqueue(kid.Origin);
                         kid.Origin.setParent(u);
                         DFSVisit(kid.Origin, st, FirstDFS);
                     }
@@ -187,6 +189,7 @@ public class DynamicGraph {
                     head.setColor(0);
                     head.setDistance(Double.POSITIVE_INFINITY);
                     head.setParent(null);
+                    head.sons = new LinkedListQueue<>();
                 }
             }
         }
@@ -194,6 +197,7 @@ public class DynamicGraph {
         S.setColor(1);
         S.setDistance(0);
         S.setParent(null);
+        S.sons = new LinkedListQueue<>();
         q.emptyQueue();
         q.enqueue(S);
     }

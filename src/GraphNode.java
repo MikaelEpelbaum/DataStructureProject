@@ -11,6 +11,7 @@ class GraphNode {
     int out;
     private GraphNode parent;
     private int color;
+    public LinkedListQueue<GraphNode> sons;
    /*
    white - 0 - undiscovered
    grey - 1 - discovered but it may have undiscovered neighbors
