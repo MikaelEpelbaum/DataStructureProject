@@ -17,7 +17,6 @@ class LinkedListQueue<T>
         queueSize = 0;
     }
 
-
     //check if the queue is empty
     public boolean isEmpty() {return (queueSize == 0);}
     public int getSize(){return queueSize;}
